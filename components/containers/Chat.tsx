@@ -10,10 +10,22 @@ export default function Chat(): JSX.Element {
   const [messages, setMessages] = useState<any>([]);
   const [text, setText] = useState<string>();
   const groupStore = useGroupStore<GroupStoreState>((state) => state);
-  const group =
-    groupStore.groups.length > 0 && groupStore.current !== null
-      ? groupStore.groups.find((group) => group.id === groupStore.current)
-      : null;
+
+  let group = null;
+
+  if (groupStore.groups.length > 0 && groupStore.current !== null) {
+    const mygroup = groupStore.groups.find(
+      (group) => group.id === groupStore.current
+    );
+    if (mygroup) {
+      group = mygroup;
+    } else {
+      const suggestion = groupStore.suggestions.find(
+        (group) => group.id === groupStore.current
+      );
+      group = suggestion;
+    }
+  }
 
   useEffect(() => {
     if (groupStore.current) {
@@ -49,25 +61,30 @@ export default function Chat(): JSX.Element {
   };
 
   return (
-    <div>
+    <div className="h-screen pb-10">
       {group !== null ? (
-        <div>
-          <div>
-            <h1>{group.name}</h1>
+        <div className="h-full flex flex-col justify-between">
+          <div className="flex-1 space-y-4">
+            <div className="h-14 px-4 bg-white flex items-center">
+              <h1 className="font-semibold">{group.name}</h1>
+            </div>
+            <div className="px-4">{group.description}</div>
+            <div className="px-4">
+              {messages.map((message: any) => (
+                <div key={message.id}>
+                  <p>{message.text}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <div>{group.description}</div>
-          <div>
-            {messages.map((message: any) => (
-              <div key={message.id}>
-                <p>{message.text}</p>
-              </div>
-            ))}
-          </div>
-          <div>
+
+          <div className="flex items-center gap-4 px-4">
             <textarea
+              className="flex-1 p-3 rounded-md"
               value={text}
+              placeholder="Type message"
               onChange={(e) => setText(e.target.value)}
-            ></textarea>
+            />
             <AppButton text="Send" onClick={handleSendMessage} />
           </div>
         </div>

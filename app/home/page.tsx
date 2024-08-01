@@ -3,11 +3,11 @@ import Groups from "@/components/containers/Groups";
 
 export default function Home(): JSX.Element {
   return (
-    <main className="flex">
-      <div className="w-6/12">
+    <main className="flex w-8/12 mx-auto shadow-sm">
+      <div className="w-4/12">
         <Groups />
       </div>
-      <div className="w-6/12 bg-slate-300">
+      <div className="flex-1">
         <Chat />
       </div>
     </main>

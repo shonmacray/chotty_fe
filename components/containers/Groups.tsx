@@ -12,21 +12,15 @@ export default function Groups(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    getMyGroups();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const getAllGroups = async () => {
-    const data = await FetchGroups();
-    groupStore.setGroups(data);
-  };
+    const groupdata = await FetchGroups();
+    const mygroups = await FetchMyGroups();
 
-  const getMyGroups = async () => {
-    const data = await FetchMyGroups();
-    const groups = data.map((groupsU: any) => groupsU.group);
-
+    const groups = mygroups.map((groupsU: any) => groupsU.group);
     joinRooms(groups);
+
+    groupStore.setGroups(groups);
+    groupStore.setSuggestions(groupdata);
   };
 
   const joinRooms = (data: any) => {
@@ -39,10 +33,12 @@ export default function Groups(): JSX.Element {
   };
 
   return (
-    <div>
+    <div className="space-y-4  h-screen border-r bg-zinc-200 border-zinc-100">
       <div>
-        <h1>Public Groups</h1>
-        <ul>
+        <div className="px-4 h-14 flex items-center bg-white">
+          <h1 className="font-semibold">Subscriptions</h1>
+        </div>
+        <ul className="px-4 pt-4">
           {groupStore.groups &&
             groupStore.groups.map((group) => (
               <li key={group.id}>
@@ -53,9 +49,19 @@ export default function Groups(): JSX.Element {
             ))}
         </ul>
       </div>
-      {/* <div>
-        <h1></h1>
-      </div> */}
+      <div className="px-4">
+        <h1>Suggested</h1>
+        <ul>
+          {groupStore.suggestions &&
+            groupStore.suggestions.map((group) => (
+              <li key={group.id}>
+                <button onClick={() => setCurrent(group.id)}>
+                  {group.name}
+                </button>
+              </li>
+            ))}
+        </ul>
+      </div>
     </div>
   );
 }
