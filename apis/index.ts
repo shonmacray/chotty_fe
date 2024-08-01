@@ -9,3 +9,10 @@ export const FetchMessages = async (groupId: string): Promise<any> => {
   });
   return await req.json();
 };
+
+export const FetchMyGroups = async (): Promise<any> => {
+  const req = await fetch(`http://localhost:8000/user/groups`, {
+    method: "GET",
+  });
+  return await req.json();
+};
