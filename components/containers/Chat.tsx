@@ -51,11 +51,9 @@ export default function Chat(): JSX.Element {
   };
 
   const handleSendMessage = () => {
-    const id = localStorage.getItem("user");
     socket.emit("message", {
       text,
       room: group.name,
-      user_id: id,
       group_id: group.id,
     });
     setText("");

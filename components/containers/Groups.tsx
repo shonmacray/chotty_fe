@@ -2,13 +2,7 @@
 import { FetchGroups, FetchMyGroups } from "@/apis";
 import { socket } from "@/apis/socket";
 import { GroupStoreState, useGroupStore } from "@/store/groups";
-import {
-  ArrowUp01Icon,
-  Cards02Icon,
-  EggsIcon,
-  FireIcon,
-  GiftIcon,
-} from "hugeicons-react";
+import { Cards02Icon, EggsIcon, FireIcon } from "hugeicons-react";
 import { useEffect } from "react";
 
 export default function Groups(): JSX.Element {
@@ -23,8 +17,12 @@ export default function Groups(): JSX.Element {
     const groupdata = await FetchGroups();
     const mygroups = await FetchMyGroups();
 
-    const groups = mygroups.map((groupsU: any) => groupsU.group);
-    joinRooms(groups);
+    const groups = mygroups
+      ? mygroups.map((groupsU: any) => groupsU.group)
+      : [];
+    if (groups.length > 0) {
+      joinRooms(groups);
+    }
 
     groupStore.setGroups(groups);
     groupStore.setSuggestions(groupdata);
