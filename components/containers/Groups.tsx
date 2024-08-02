@@ -2,6 +2,13 @@
 import { FetchGroups, FetchMyGroups } from "@/apis";
 import { socket } from "@/apis/socket";
 import { GroupStoreState, useGroupStore } from "@/store/groups";
+import {
+  ArrowUp01Icon,
+  Cards02Icon,
+  EggsIcon,
+  FireIcon,
+  GiftIcon,
+} from "hugeicons-react";
 import { useEffect } from "react";
 
 export default function Groups(): JSX.Element {
@@ -33,12 +40,13 @@ export default function Groups(): JSX.Element {
   };
 
   return (
-    <div className="space-y-4  h-screen border-r bg-zinc-200 border-zinc-100">
+    <div className="">
       <div>
-        <div className="px-4 h-14 flex items-center bg-white">
-          <h1 className="font-semibold">Subscriptions</h1>
+        <div className="h-14 flex items-center gap-2 bg-white px-3">
+          <EggsIcon />
+          <h1 className="font-semibold">Groups</h1>
         </div>
-        <ul className="px-4 pt-4">
+        <ul className="px-3 pt-4">
           {groupStore.groups &&
             groupStore.groups.map((group) => (
               <li key={group.id}>
@@ -49,7 +57,7 @@ export default function Groups(): JSX.Element {
             ))}
         </ul>
       </div>
-      <div className="px-4">
+      <div className="px-3 py-3">
         <h1>Suggested</h1>
         <ul>
           {groupStore.suggestions &&
@@ -61,6 +69,14 @@ export default function Groups(): JSX.Element {
               </li>
             ))}
         </ul>
+      </div>
+      <div className="h-14 flex items-center gap-2 bg-white px-3">
+        <FireIcon />
+        <h1 className="">Rewards</h1>
+      </div>
+      <div className="h-14 flex items-center gap-2 bg-white px-3">
+        <Cards02Icon />
+        <h1 className="">Subscriptions</h1>
       </div>
     </div>
   );
