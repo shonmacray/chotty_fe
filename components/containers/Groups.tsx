@@ -44,16 +44,18 @@ export default function Groups(): JSX.Element {
           <EggsIcon />
           <h1 className="font-semibold">Groups</h1>
         </div>
-        <ul className="px-3 pt-4">
-          {groupStore.groups &&
-            groupStore.groups.map((group) => (
+
+        {groupStore.groups && groupStore.groups.length > 0 && (
+          <ul className="px-3 pt-4">
+            {groupStore.groups.map((group) => (
               <li key={group.id}>
                 <button onClick={() => setCurrent(group.id)}>
                   {group.name}
                 </button>
               </li>
             ))}
-        </ul>
+          </ul>
+        )}
       </div>
       <div className="px-3 py-3">
         <h1>Suggested</h1>

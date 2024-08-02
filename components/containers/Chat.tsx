@@ -14,16 +14,15 @@ export default function Chat(): JSX.Element {
 
   let group = null;
 
-  if (groupStore.groups.length > 0 && groupStore.current !== null) {
-    const mygroup = groupStore.groups.find(
+  const mygroup = groupStore.groups.find(
+    (group) => group.id === groupStore.current
+  );
+  if (mygroup === undefined) {
+    const suggestion = groupStore.suggestions.find(
       (group) => group.id === groupStore.current
     );
-    if (mygroup) {
-      group = mygroup;
-    } else {
-      const suggestion = groupStore.suggestions.find(
-        (group) => group.id === groupStore.current
-      );
+
+    if (suggestion !== undefined) {
       group = suggestion;
     }
   }
