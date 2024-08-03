@@ -1,6 +1,4 @@
-const token = localStorage.getItem("CT_access_token");
-
-export const FetchGroups = async (): Promise<any> => {
+export const FetchGroups = async (token: string | null): Promise<any> => {
   const req = await fetch("http://localhost:8000/chat", {
     method: "GET",
     headers: { authorization: `Bearer ${token}` },
@@ -15,7 +13,7 @@ export const FetchMessages = async (groupId: string): Promise<any> => {
   return await req.json();
 };
 
-export const FetchMyGroups = async (): Promise<any> => {
+export const FetchMyGroups = async (token: string | null): Promise<any> => {
   const req = await fetch(`http://localhost:8000/user/groups`, {
     method: "GET",
     headers: { authorization: `Bearer ${token}` },

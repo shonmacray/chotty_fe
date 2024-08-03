@@ -1,36 +1,53 @@
 "use client";
-import { FetchGroups, FetchMyGroups } from "@/apis";
-import { socket } from "@/apis/socket";
+import { FetchGroups, FetchMyGroups } from "@/app/apis";
 import { GroupStoreState, useGroupStore } from "@/store/groups";
-import { Cards02Icon, EggsIcon, FireIcon } from "hugeicons-react";
-import { useEffect } from "react";
+import {
+  AiMagicIcon,
+  Bone01Icon,
+  Cards02Icon,
+  Tornado01Icon,
+} from "hugeicons-react";
+import { useEffect, useState } from "react";
+import { Accordion, AccordionItem } from "@szhsin/react-accordion";
+import AccordionHeader from "../AccordionHeader";
+import { useSocket } from "@/hooks/UseSocket";
 
 export default function Groups(): JSX.Element {
   const groupStore = useGroupStore((state: GroupStoreState) => state);
+  const [token, setToken] = useState<string | null>(null);
+
+  const socket = useSocket();
 
   useEffect(() => {
-    getAllGroups();
+    const t = localStorage.getItem("CT_access_token");
+    setToken(t);
+
+    if (token) {
+      getAllGroups(token);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [token]);
 
-  const getAllGroups = async () => {
-    const groupdata = await FetchGroups();
-    const mygroups = await FetchMyGroups();
+  const getAllGroups = async (token: string | null) => {
+    const groupdata = await FetchGroups(token);
+    const mygroups = await FetchMyGroups(token);
 
-    const groups = mygroups
-      ? mygroups.map((groupsU: any) => groupsU.group)
+    // sometimes data comes as object where token is not sent
+
+    const groups = Array.isArray(mygroups)
+      ? mygroups?.map((groupsU: any) => groupsU.group)
       : [];
     if (groups.length > 0) {
       joinRooms(groups);
     }
 
     groupStore.setGroups(groups);
-    groupStore.setSuggestions(groupdata);
+    groupStore.setSuggestions(Array.isArray(groupdata) ? groupdata : []);
   };
 
   const joinRooms = (data: any) => {
     const rooms = data.map((room: any) => room.name);
-    socket.emit("join", rooms);
+    socket?.emit("join", rooms);
   };
 
   const setCurrent = (id: string) => {
@@ -39,45 +56,54 @@ export default function Groups(): JSX.Element {
 
   return (
     <div className="">
-      <div>
-        <div className="h-14 flex items-center gap-2 bg-white px-3">
-          <EggsIcon />
-          <h1 className="font-semibold">Groups</h1>
-        </div>
-
-        {groupStore.groups && groupStore.groups.length > 0 && (
-          <ul className="px-3 pt-4">
-            {groupStore.groups.map((group) => (
-              <li key={group.id}>
-                <button onClick={() => setCurrent(group.id)}>
-                  {group.name}
-                </button>
-              </li>
-            ))}
+      <Accordion transition transitionTimeout={1000}>
+        <AccordionItem
+          initialEntered
+          header={<AccordionHeader icon={<Tornado01Icon />} title="Groups" />}
+        >
+          <ul className="px-3 py-1 space-y-2">
+            {groupStore.groups.length > 0 &&
+              groupStore.groups.map((group) => (
+                <li key={group.id}>
+                  <button onClick={() => setCurrent(group.id)}>
+                    {group.name}
+                  </button>
+                </li>
+              ))}
+            <li className="flex items-center gap-1">
+              <Bone01Icon size={16} /> <p className="text-md">Suggested</p>
+            </li>
+            {groupStore.suggestions &&
+              groupStore.suggestions.map((group) => (
+                <li key={group.id}>
+                  <button onClick={() => setCurrent(group.id)}>
+                    {group.name}
+                  </button>
+                </li>
+              ))}
           </ul>
-        )}
-      </div>
-      <div className="px-3 py-3">
-        <h1>Suggested</h1>
-        <ul>
-          {groupStore.suggestions &&
-            groupStore.suggestions.map((group) => (
-              <li key={group.id}>
-                <button onClick={() => setCurrent(group.id)}>
-                  {group.name}
-                </button>
-              </li>
-            ))}
-        </ul>
-      </div>
-      <div className="h-14 flex items-center gap-2 bg-white px-3">
-        <FireIcon />
-        <h1 className="">Rewards</h1>
-      </div>
-      <div className="h-14 flex items-center gap-2 bg-white px-3">
-        <Cards02Icon />
-        <h1 className="">Subscriptions</h1>
-      </div>
+        </AccordionItem>
+
+        <AccordionItem
+          header={<AccordionHeader icon={<AiMagicIcon />} title="Rewards" />}
+        >
+          <div className="px-3">
+            Quisque eget luctus mi, vehicula mollis lorem. Proin fringilla vel
+            erat quis sodales.
+          </div>
+        </AccordionItem>
+
+        <AccordionItem
+          header={
+            <AccordionHeader icon={<Cards02Icon />} title="Subscriptions" />
+          }
+        >
+          <div className="px-3">
+            Suspendisse massa risus, pretium id interdum in, dictum sit amet
+            ante.
+          </div>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }

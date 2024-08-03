@@ -1,16 +1,25 @@
 "use client";
 
-import { FetchMessages } from "@/apis";
+import { FetchMessages } from "@/app/apis";
 import { GroupStoreState, useGroupStore } from "@/store/groups";
 import { useEffect, useState } from "react";
 import AppButton from "../Button";
-import { socket } from "@/apis/socket";
 import { CheckmarkBadge02Icon } from "hugeicons-react";
+import { useSocket } from "@/hooks/UseSocket";
 
 export default function Chat(): JSX.Element {
+  const [token, setToken] = useState<string | null>(null);
+
   const [messages, setMessages] = useState<any>([]);
   const [text, setText] = useState<string>();
   const groupStore = useGroupStore<GroupStoreState>((state) => state);
+
+  const socket = useSocket();
+
+  useEffect(() => {
+    const t = localStorage.getItem("CT_access_token");
+    setToken(t);
+  }, []);
 
   let group = null;
 
@@ -25,6 +34,8 @@ export default function Chat(): JSX.Element {
     if (suggestion !== undefined) {
       group = suggestion;
     }
+  } else {
+    group = mygroup;
   }
 
   useEffect(() => {
@@ -35,14 +46,14 @@ export default function Chat(): JSX.Element {
   }, [groupStore.current]);
 
   useEffect(() => {
-    socket.on("member", (data) => {
+    socket?.on("member", (data: any) => {
       const newArr = [...messages];
       newArr.push(data);
       setMessages(newArr);
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
+  }, [messages, socket]);
 
   const getMessages = async (id: string) => {
     const data = await FetchMessages(id);
@@ -50,7 +61,7 @@ export default function Chat(): JSX.Element {
   };
 
   const handleSendMessage = () => {
-    socket.emit("message", {
+    socket?.emit("message", {
       text,
       room: group.name,
       group_id: group.id,

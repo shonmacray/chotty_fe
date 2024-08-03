@@ -8,13 +8,10 @@ interface Props {
 
 export default function AuthContainer({ children }: Props): JSX.Element {
   const router = useRouter();
-
   useEffect(() => {
-    const token = localStorage.getItem("CT_access_token");
+    const token = document.cookie;
 
-    console.log(token);
-
-    if (token !== null) {
+    if (token) {
       router.replace("home");
     } else {
       router.replace("/");

@@ -1,5 +1,5 @@
 "use client";
-import { login } from "@/apis";
+import { login } from "@/app/apis";
 import AppButton from "@/components/Button";
 import Input from "@/components/Input";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ export default function Home() {
       const data = await login(form);
 
       localStorage.setItem("CT_access_token", data.access_token);
+      document.cookie = data.access_token;
       router.push("home");
     }
   };
