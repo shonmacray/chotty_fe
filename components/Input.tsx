@@ -15,7 +15,7 @@ export default function Input({
 }: Props): JSX.Element {
   return (
     <input
-      className="w-full ring-1 px-3 py-2 rounded-md"
+      className="w-full ring-1 ring-gray-200 focus:ring-sky-600 px-4 py-2 rounded-md"
       value={value}
       onChange={onChange}
       type={type}

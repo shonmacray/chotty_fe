@@ -21,9 +21,11 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-100">
-      <h1 className="text-2xl font-medium">Welcome to Chotty!</h1>
-      <p className="text-xl my-4">Login</p>
-      <div className="w-[280px] space-y-4">
+      {/* <h1 className="text-2xl font-medium">Welcome to Chotty!</h1> */}
+
+      <div className="w-[290px] space-y-4">
+        <p className="text-3xl my-4 font-medium text-center">Login</p>
+        <div className="h-2" />
         <div>
           <Input
             placeholder="Email Address"
@@ -41,6 +43,7 @@ export default function Home() {
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
         </div>
+        <div className="h-3" />
 
         <AppButton variant="secondary" text="Login" onClick={setUser} />
       </div>

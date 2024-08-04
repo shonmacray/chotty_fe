@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@szhsin/react-accordion": "^1.2.4",
+    "@tanstack/react-query": "^5.51.21",
     "hugeicons-react": "^0.3.0",
     "next": "14.2.5",
     "react": "^18",

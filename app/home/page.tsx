@@ -3,8 +3,8 @@ import Groups from "@/components/containers/Groups";
 
 export default function Home(): JSX.Element {
   return (
-    <main className="flex w-7/12 mx-auto py-4 h-screen gap-4">
-      <div className="w-3/12 shadow-md rounded-lg overflow-hidden">
+    <main className="lg:flex w-11/12 lg:w-8/12 xl:w-7/12 mx-auto py-4 h-screen gap-4">
+      <div className="w-full hidden lg:block lg:w-3/12 shadow-md rounded-lg overflow-hidden">
         <Groups />
       </div>
       <div className="flex-1 shadow-md rounded-lg overflow-hidden">

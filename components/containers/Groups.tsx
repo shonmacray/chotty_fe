@@ -5,6 +5,7 @@ import {
   AiMagicIcon,
   Bone01Icon,
   Cards02Icon,
+  FireIcon,
   Tornado01Icon,
 } from "hugeicons-react";
 import { useEffect, useState } from "react";
@@ -70,8 +71,11 @@ export default function Groups(): JSX.Element {
                   </button>
                 </li>
               ))}
-            <li className="flex items-center gap-1">
-              <Bone01Icon size={16} /> <p className="text-md">Suggested</p>
+            <li>
+              <div className="inline-flex gap-1 py-1 bg-emerald-500 text-white items-center px-3 rounded-full">
+                <FireIcon size={16} />
+                <p className="text-sm font-medium">Suggested</p>
+              </div>
             </li>
             {groupStore.suggestions &&
               groupStore.suggestions.map((group) => (

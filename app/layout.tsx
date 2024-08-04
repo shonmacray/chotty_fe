@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import AuthContainer from "@/components/containers/AuthContainer";
+import Providers from "./providers";
 
 const inter = DM_Sans({ subsets: ["latin"] });
 
@@ -18,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthContainer>{children}</AuthContainer>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
