@@ -2,27 +2,37 @@
 
 import { FetchMessages, sendJoinRquest } from "@/app/apis";
 import { GroupStoreState, useGroupStore } from "@/store/groups";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AppButton from "../Button";
 import { CheckmarkBadge02Icon, SentIcon, Tornado01Icon } from "hugeicons-react";
 import { useSocket } from "@/hooks/UseSocket";
-import {
-  useMutation,
-  useQuery,
-  QueryClient,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLogout } from "@/hooks/UseLogout";
 import { joinRooms } from "@/helper";
+import { useInView } from "react-intersection-observer";
 
 export default function Chat(): JSX.Element {
-  const [messages, setMessages] = useState<any>([]);
   const [text, setText] = useState<string>();
   const groupStore = useGroupStore<GroupStoreState>((state) => state);
 
   const socket = useSocket();
   const logout = useLogout();
   const queryClient = useQueryClient();
+
+  const { ref, inView, entries } = useInView({
+    threshold: 0,
+  });
+  const lastRef = useRef<HTMLDivElement>(null);
+
+  // useEffect(() => {
+  //   console.log(inView);
+  // }, [inView]);
+  useEffect(() => {
+    if (groupStore.current) {
+      lastRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupStore.current]);
 
   const { isLoading, data } = useQuery({
     queryKey: ["messages", groupStore.current],
@@ -130,7 +140,8 @@ export default function Chat(): JSX.Element {
                       )}
                     </ul>
                   ))}
-                <div className="h-10" />
+                <div className="h-10" ref={ref} />
+                <div className="" ref={lastRef} />
               </div>
             </div>
           </div>

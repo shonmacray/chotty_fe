@@ -87,7 +87,12 @@ export default function Groups(): JSX.Element {
             <ul className="px-3 py-1 space-y-2">
               {groupStore.groups.length > 0 &&
                 groupStore.groups.map((group) => (
-                  <li key={group.id}>
+                  <li
+                    key={group.id}
+                    className={`${
+                      group.id === groupStore.current ? "font-semibold" : ""
+                    }`}
+                  >
                     <button onClick={() => setCurrent(group.id)}>
                       {group.name}
                     </button>
