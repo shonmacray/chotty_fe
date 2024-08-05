@@ -3,6 +3,7 @@ export const FetchGroups = async (token: string | null): Promise<any> => {
     method: "GET",
     headers: { authorization: `Bearer ${token}` },
   });
+
   return await req.json();
 };
 

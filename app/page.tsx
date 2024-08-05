@@ -14,17 +14,14 @@ export default function Home() {
       const data = await login(form);
 
       localStorage.setItem("CT_access_token", data.access_token);
-      document.cookie = data.access_token;
       router.push("home");
     }
   };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-100">
-      {/* <h1 className="text-2xl font-medium">Welcome to Chotty!</h1> */}
-
       <div className="w-[290px] space-y-4">
-        <p className="text-3xl my-4 font-medium text-center">Login</p>
+        <p className="text-3xl my-4 font-bold text-center">Login</p>
         <div className="h-2" />
         <div>
           <Input

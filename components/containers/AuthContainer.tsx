@@ -9,7 +9,7 @@ interface Props {
 export default function AuthContainer({ children }: Props): JSX.Element {
   const router = useRouter();
   useEffect(() => {
-    const token = document.cookie;
+    const token = localStorage.getItem("CT_access_token");
 
     if (token) {
       router.replace("home");
