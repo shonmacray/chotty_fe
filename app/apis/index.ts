@@ -38,3 +38,18 @@ export const login = async (data: loginData): Promise<any> => {
   });
   return await req.json();
 };
+
+export const sendJoinRquest = async (
+  id: string,
+  token: string
+): Promise<any> => {
+  const req = await fetch(`http://localhost:8000/chat/join/${id}`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      authorization: `Bearer ${token}`,
+    },
+  });
+  return await req.json();
+};

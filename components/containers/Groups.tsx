@@ -13,6 +13,7 @@ import AccordionHeader from "../AccordionHeader";
 import { useSocket } from "@/hooks/UseSocket";
 import { useQuery } from "@tanstack/react-query";
 import { useLogout } from "@/hooks/UseLogout";
+import { joinRooms } from "@/helper";
 
 export default function Groups(): JSX.Element {
   const groupStore = useGroupStore((state: GroupStoreState) => state);
@@ -21,7 +22,7 @@ export default function Groups(): JSX.Element {
   const socket = useSocket();
   const logout = useLogout();
 
-  const { isLoading, data } = useQuery({
+  const { isLoading, data, refetch } = useQuery({
     queryKey: ["suggested", token],
     queryFn: () => {
       return FetchGroups(token);
@@ -41,7 +42,7 @@ export default function Groups(): JSX.Element {
         ? mygroups?.map((groupsU: any) => groupsU.group)
         : [];
       if (groups.length > 0) {
-        joinRooms(groups);
+        joinRooms(groups, socket);
       }
       groupStore.setGroups(groups);
     }
@@ -60,14 +61,14 @@ export default function Groups(): JSX.Element {
   }, [data, isLoading]);
 
   useEffect(() => {
+    refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupStore.groups]);
+
+  useEffect(() => {
     const t = localStorage.getItem("CT_access_token");
     setToken(t);
   }, [token]);
-
-  const joinRooms = (data: any) => {
-    const rooms = data.map((room: any) => room.name);
-    socket?.emit("join", rooms);
-  };
 
   const setCurrent = (id: string) => {
     groupStore.setCurrent(id);
@@ -92,12 +93,15 @@ export default function Groups(): JSX.Element {
                     </button>
                   </li>
                 ))}
-              <li>
-                <div className="inline-flex gap-1 py-1 bg-emerald-500 text-white items-center px-3 rounded-full">
-                  <FireIcon size={16} />
-                  <p className="text-sm font-medium">Suggested</p>
-                </div>
-              </li>
+              {groupStore.suggestions.length > 0 && (
+                <li>
+                  <div className="inline-flex gap-1 py-1 bg-emerald-500 text-white items-center px-3 rounded-full">
+                    <FireIcon size={16} />
+                    <p className="text-sm font-medium">Suggested</p>
+                  </div>
+                </li>
+              )}
+
               {groupStore.suggestions &&
                 groupStore.suggestions.map((group) => (
                   <li key={group.id}>

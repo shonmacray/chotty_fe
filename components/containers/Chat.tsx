@@ -1,13 +1,19 @@
 "use client";
 
-import { FetchMessages } from "@/app/apis";
+import { FetchMessages, sendJoinRquest } from "@/app/apis";
 import { GroupStoreState, useGroupStore } from "@/store/groups";
 import { useEffect, useState } from "react";
 import AppButton from "../Button";
 import { CheckmarkBadge02Icon, SentIcon, Tornado01Icon } from "hugeicons-react";
 import { useSocket } from "@/hooks/UseSocket";
-import { useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  QueryClient,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useLogout } from "@/hooks/UseLogout";
+import { joinRooms } from "@/helper";
 
 export default function Chat(): JSX.Element {
   const [messages, setMessages] = useState<any>([]);
@@ -16,11 +22,20 @@ export default function Chat(): JSX.Element {
 
   const socket = useSocket();
   const logout = useLogout();
+  const queryClient = useQueryClient();
 
   const { isLoading, data } = useQuery({
     queryKey: ["messages", groupStore.current],
     queryFn: () => FetchMessages(groupStore.current!),
     enabled: groupStore.current ? true : false,
+  });
+
+  const join = useMutation({
+    mutationKey: ["sendJoinRequest"],
+    mutationFn: (id: string) => {
+      const token = localStorage.getItem("CT_access_token");
+      return sendJoinRquest(id, token!);
+    },
   });
 
   let group = null;
@@ -51,13 +66,15 @@ export default function Chat(): JSX.Element {
 
   useEffect(() => {
     socket?.on("member", (data: any) => {
-      const newArr = [...messages];
-      newArr.push(data);
-      setMessages(newArr);
-    });
+      queryClient.cancelQueries({ queryKey: ["messages", data.group_id] });
 
+      queryClient.setQueryData(["messages", data.group_id], (old: any) => [
+        ...old,
+        data,
+      ]);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, socket]);
+  }, [socket]);
 
   const handleSendMessage = () => {
     if (text) {
@@ -65,9 +82,21 @@ export default function Chat(): JSX.Element {
         text,
         room: group.name,
         group_id: group.id,
-        last_id: messages.length,
+        last_id: data.length,
       });
       setText("");
+    }
+  };
+
+  const joinGroup = async () => {
+    if (groupStore.current) {
+      const data = await join.mutateAsync(groupStore.current);
+      if (data.created) {
+        const groups = [...groupStore.groups];
+        groups.push(suggested);
+        joinRooms(groups, socket);
+        groupStore.setGroups(groups);
+      }
     }
   };
 
@@ -121,7 +150,10 @@ export default function Chat(): JSX.Element {
             </div>
           ) : (
             <div className="flex justify-center">
-              <AppButton text="Join Group" onClick={() => {}}>
+              <AppButton
+                text={join.isPending ? "loading..." : "Join Group"}
+                onClick={joinGroup}
+              >
                 <Tornado01Icon />
               </AppButton>
             </div>
