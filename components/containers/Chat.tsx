@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import AppButton from "../Button";
 import { CheckmarkBadge02Icon, SentIcon, Tornado01Icon } from "hugeicons-react";
 import { useSocket } from "@/hooks/UseSocket";
+import { useQuery } from "@tanstack/react-query";
+import { useLogout } from "@/hooks/UseLogout";
 
 export default function Chat(): JSX.Element {
   const [messages, setMessages] = useState<any>([]);
@@ -13,6 +15,13 @@ export default function Chat(): JSX.Element {
   const groupStore = useGroupStore<GroupStoreState>((state) => state);
 
   const socket = useSocket();
+  const logout = useLogout();
+
+  const { isLoading, data } = useQuery({
+    queryKey: ["messages", groupStore.current],
+    queryFn: () => FetchMessages(groupStore.current!),
+    enabled: groupStore.current ? true : false,
+  });
 
   let group = null;
   let suggested = null;
@@ -33,11 +42,12 @@ export default function Chat(): JSX.Element {
   }
 
   useEffect(() => {
-    if (groupStore.current) {
-      getMessages(groupStore.current);
+    if (!isLoading) {
+      if (data && data?.error) {
+        logout();
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupStore.current]);
+  }, [isLoading, data, logout]);
 
   useEffect(() => {
     socket?.on("member", (data: any) => {
@@ -48,11 +58,6 @@ export default function Chat(): JSX.Element {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, socket]);
-
-  const getMessages = async (id: string) => {
-    const data = await FetchMessages(id);
-    setMessages([...data]);
-  };
 
   const handleSendMessage = () => {
     if (text) {
@@ -82,20 +87,21 @@ export default function Chat(): JSX.Element {
                 {group?.description || suggested.description}
               </div>
               <div className="px-5 max-h-[350px] pb-4">
-                {messages.map((message: any, i: number) => (
-                  <ul key={message.id}>
-                    <li>{message.text}</li>
+                {data &&
+                  data.map((message: any, i: number) => (
+                    <ul key={message.id}>
+                      <li>{message.text}</li>
 
-                    {messages[i].user_id !== messages[i + 1]?.user_id && (
-                      <li className="my-1 bg-slate-200">
-                        <p className=" text-center text-xs text-slate-700">
-                          User
-                          {messages[i].user_id}
-                        </p>
-                      </li>
-                    )}
-                  </ul>
-                ))}
+                      {data[i]?.user_id !== data[i + 1]?.user_id && (
+                        <li className="my-1 bg-slate-200">
+                          <p className=" text-center text-xs text-slate-700">
+                            User
+                            {data[i]?.user_id}
+                          </p>
+                        </li>
+                      )}
+                    </ul>
+                  ))}
                 <div className="h-10" />
               </div>
             </div>
