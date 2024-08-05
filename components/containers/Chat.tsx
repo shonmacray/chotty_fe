@@ -124,8 +124,7 @@ export default function Chat(): JSX.Element {
                       {data[i]?.user_id !== data[i + 1]?.user_id && (
                         <li className="my-1 bg-slate-200">
                           <p className=" text-center text-xs text-slate-700">
-                            User
-                            {data[i]?.user_id}
+                            {`${data[i]?.user.first_name} ${data[i]?.user.last_name}`}
                           </p>
                         </li>
                       )}
