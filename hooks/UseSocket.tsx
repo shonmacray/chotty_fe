@@ -8,7 +8,7 @@ export const useSocket = () => {
   useEffect(() => {
     const token = localStorage.getItem("CT_access_token");
     if (!socket) {
-      socket = io("http://localhost:8000/group", {
+      socket = io(`${process.env.NEXT_PUBLIC_API_URL}/group`, {
         auth: { token: `Bearer ${token}` },
       });
     }

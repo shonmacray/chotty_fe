@@ -1,5 +1,7 @@
+const url = process.env.NEXT_PUBLIC_API_URL;
+
 export const FetchGroups = async (token: string | null): Promise<any> => {
-  const req = await fetch("http://localhost:8000/chat", {
+  const req = await fetch(`${url}/chat`, {
     method: "GET",
     headers: { authorization: `Bearer ${token}` },
   });
@@ -8,14 +10,14 @@ export const FetchGroups = async (token: string | null): Promise<any> => {
 };
 
 export const FetchMessages = async (groupId: string): Promise<any> => {
-  const req = await fetch(`http://localhost:8000/chat/${groupId}`, {
+  const req = await fetch(`${url}/chat/${groupId}`, {
     method: "GET",
   });
   return await req.json();
 };
 
 export const FetchMyGroups = async (token: string | null): Promise<any> => {
-  const req = await fetch(`http://localhost:8000/user/groups`, {
+  const req = await fetch(`${url}/user/groups`, {
     method: "GET",
     headers: { authorization: `Bearer ${token}` },
   });
@@ -28,7 +30,7 @@ interface loginData {
 }
 
 export const login = async (data: loginData): Promise<any> => {
-  const req = await fetch(`http://localhost:8000/auth/login`, {
+  const req = await fetch(`${url}/auth/login`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -47,7 +49,7 @@ interface SignupData {
 }
 
 export const signup = async (data: SignupData): Promise<any> => {
-  const req = await fetch(`http://localhost:8000/auth/signup`, {
+  const req = await fetch(`${url}/auth/signup`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -62,7 +64,7 @@ export const sendJoinRquest = async (
   id: string,
   token: string
 ): Promise<any> => {
-  const req = await fetch(`http://localhost:8000/chat/join/${id}`, {
+  const req = await fetch(`${url}/chat/join/${id}`, {
     method: "POST",
     headers: {
       Accept: "application/json",
