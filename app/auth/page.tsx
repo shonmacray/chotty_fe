@@ -3,20 +3,31 @@ import AppButton from "@/components/Button";
 import Input from "@/components/Input";
 import { UserStoreState, useUserStore } from "@/store/user";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { signup } from "../apis";
 import { useMutation } from "@tanstack/react-query";
 import { Loading02Icon } from "hugeicons-react";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { SubmitHandler, useForm } from "react-hook-form";
+
+interface FormInput {
+  first_name: string;
+  last_name: string;
+  email_address: string;
+  password: string;
+}
 
 export default function Signup(): JSX.Element {
-  const [form, setForm] = useState({
-    first_name: "",
-    last_name: "",
-    email_address: "",
-    password: "",
+  const { handleSubmit, control } = useForm<FormInput>({
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      email_address: "",
+      password: "",
+    },
+    mode: "onChange",
   });
+
   const router = useRouter();
   const user = useUserStore<UserStoreState>((state) => state);
 
@@ -27,74 +38,73 @@ export default function Signup(): JSX.Element {
     },
   });
 
-  const setUser = async () => {
-    if (
-      form.email_address &&
-      form.password &&
-      form.first_name &&
-      form.last_name
-    ) {
-      const data = await create.mutateAsync(form);
-      console.log(data);
+  const onSubmit: SubmitHandler<FormInput> = async (form) => {
+    const data = await create.mutateAsync(form);
 
-      if (data.statusCode > 300) {
-        Array.isArray(data?.message)
-          ? data?.message?.forEach((message: string) => {
-              toast.error(message);
-            })
-          : toast.error(data.message);
-      } else {
-        const timeout = 1000;
-        toast.success("Account Created!", { autoClose: timeout });
+    if (data.statusCode > 300) {
+      Array.isArray(data?.message)
+        ? data?.message?.forEach((message: string) => {
+            toast.error(message);
+          })
+        : toast.error(data.message);
+    } else {
+      const timeout = 1000;
+      toast.success("Account Created!", { autoClose: timeout });
 
-        setTimeout(() => {
-          user.setUser({ ...data.user, access_token: data.access_token });
-          localStorage.setItem("CT_access_token", data.access_token);
-          router.push("home");
-        }, timeout);
-      }
+      setTimeout(() => {
+        user.setUser({ ...data.user, access_token: data.access_token });
+        localStorage.setItem("CT_access_token", data.access_token);
+        router.push("home");
+      }, timeout);
     }
   };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-100">
-      <div className="w-[290px] space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="w-[290px] space-y-4">
         <p className="text-3xl my-4 font-bold text-center">Create Account</p>
         <div className="h-2" />
         <div>
           <Input
-            placeholder="First Name"
-            value={form.first_name}
-            onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+            control={control}
+            name="first_name"
+            placeholder="First name"
+            rules={{ required: true }}
           />
         </div>
         <div>
           <Input
-            placeholder="Last Name"
-            value={form.last_name}
-            onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+            control={control}
+            name="last_name"
+            placeholder="Last name"
+            rules={{ required: true }}
           />
         </div>
         <div>
           <Input
-            placeholder="Email Address"
-            value={form.email_address}
-            onChange={(e) =>
-              setForm({ ...form, email_address: e.target.value })
-            }
+            control={control}
+            name="email_address"
+            placeholder="Email address"
+            rules={{ required: true }}
           />
         </div>
         <div>
           <Input
-            type="password"
+            control={control}
+            name="password"
             placeholder="Password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            type="password"
+            rules={{ required: true }}
           />
         </div>
         <div className="h-3" />
 
-        <AppButton variant="secondary" text="Create Account" onClick={setUser}>
+        <AppButton
+          type="submit"
+          variant="secondary"
+          text="Create Account"
+          onClick={() => {}}
+        >
           {create.isPending && (
             <Loading02Icon size={18} className="animate-spin" />
           )}
@@ -106,7 +116,7 @@ export default function Signup(): JSX.Element {
             Login
           </Link>
         </p>
-      </div>
+      </form>
     </main>
   );
 }

@@ -7,11 +7,22 @@ import { useMutation } from "@tanstack/react-query";
 import { Loading02Icon } from "hugeicons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { SubmitErrorHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
+interface FormInput {
+  email_address: string;
+  password: string;
+}
+
 export default function Home() {
-  const [form, setForm] = useState({ email_address: "", password: "" });
+  const { handleSubmit, control } = useForm<any>({
+    defaultValues: {
+      email_address: "",
+      password: "",
+    },
+    mode: "onChange",
+  });
   const router = useRouter();
   const user = useUserStore<UserStoreState>((state) => state);
 
@@ -22,48 +33,51 @@ export default function Home() {
     },
   });
 
-  const setUser = async () => {
-    if (form.email_address && form.password) {
-      const data = await singin.mutateAsync(form);
+  const onSubmit: SubmitErrorHandler<FormInput> = async (form) => {
+    const data = await singin.mutateAsync(form);
 
-      if (data.statusCode > 300) {
-        Array.isArray(data?.message)
-          ? data?.message?.forEach((message: string) => {
-              toast.error(message);
-            })
-          : toast.error(data.message);
-      } else {
-        user.setUser({ ...data.user, access_token: data.access_token });
-        localStorage.setItem("CT_access_token", data.access_token);
-        router.push("home");
-      }
+    if (data.statusCode > 300) {
+      Array.isArray(data?.message)
+        ? data?.message?.forEach((message: string) => {
+            toast.error(message);
+          })
+        : toast.error(data.message);
+    } else {
+      user.setUser({ ...data.user, access_token: data.access_token });
+      localStorage.setItem("CT_access_token", data.access_token);
+      router.push("home");
     }
   };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-100">
-      <div className="w-[290px] space-y-4">
+      <form className="w-[290px] space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <p className="text-3xl my-4 font-bold text-center">Login</p>
         <div className="h-2" />
         <div>
           <Input
-            placeholder="Email Address"
-            value={form.email_address}
-            onChange={(e) =>
-              setForm({ ...form, email_address: e.target.value })
-            }
+            placeholder="Email address"
+            name="email_address"
+            control={control}
+            rules={{ required: true }}
           />
         </div>
         <div>
           <Input
-            type="password"
             placeholder="Password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            name="password"
+            type="password"
+            control={control}
+            rules={{ required: true }}
           />
         </div>
         <div className="h-3" />
-        <AppButton variant="secondary" text="Login" onClick={setUser}>
+        <AppButton
+          type="submit"
+          variant="secondary"
+          text="Login"
+          onClick={() => {}}
+        >
           {singin.isPending && (
             <Loading02Icon size={18} className="animate-spin" />
           )}
@@ -75,7 +89,7 @@ export default function Home() {
             Create account
           </Link>
         </p>
-      </div>
+      </form>
     </main>
   );
 }
