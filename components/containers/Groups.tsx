@@ -54,6 +54,7 @@ export default function Groups(): JSX.Element {
   useEffect(() => {
     if (!isLoading && data) {
       if (data.error) {
+        console.log(token);
         logout();
       } else {
         groupStore.setSuggestions(data);

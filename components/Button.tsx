@@ -16,7 +16,7 @@ export default function AppButton({
   return (
     <button
       onClick={onClick}
-      className={`text-md flex justify-center gap-1 bg-sky-500 px-5 rounded-lg text-white font-medium ${
+      className={`text-md flex justify-center items-center gap-1 bg-sky-500 px-5 rounded-lg text-white font-medium ${
         variant === "secondary" ? "w-full py-2" : "py-3"
       }`}
     >

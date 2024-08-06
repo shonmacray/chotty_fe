@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { signup } from "../apis";
 import { useMutation } from "@tanstack/react-query";
+import { Loading02Icon } from "hugeicons-react";
+import Link from "next/link";
+import { toast } from "react-toastify";
 
 export default function Signup(): JSX.Element {
   const [form, setForm] = useState({
@@ -32,10 +35,24 @@ export default function Signup(): JSX.Element {
       form.last_name
     ) {
       const data = await create.mutateAsync(form);
+      console.log(data);
 
-      user.setUser({ ...data.user, access_token: data.access_token });
-      localStorage.setItem("CT_access_token", data.access_token);
-      router.push("home");
+      if (data.statusCode > 300) {
+        Array.isArray(data?.message)
+          ? data?.message?.forEach((message: string) => {
+              toast.error(message);
+            })
+          : toast.error(data.message);
+      } else {
+        const timeout = 1000;
+        toast.success("Account Created!", { autoClose: timeout });
+
+        setTimeout(() => {
+          user.setUser({ ...data.user, access_token: data.access_token });
+          localStorage.setItem("CT_access_token", data.access_token);
+          router.push("home");
+        }, timeout);
+      }
     }
   };
 
@@ -77,11 +94,18 @@ export default function Signup(): JSX.Element {
         </div>
         <div className="h-3" />
 
-        <AppButton
-          variant="secondary"
-          text="Create Account"
-          onClick={setUser}
-        />
+        <AppButton variant="secondary" text="Create Account" onClick={setUser}>
+          {create.isPending && (
+            <Loading02Icon size={18} className="animate-spin" />
+          )}
+        </AppButton>
+        <div className="h-1" />
+        <p>
+          I have an account{" "}
+          <Link href="/" className=" underline">
+            Login
+          </Link>
+        </p>
       </div>
     </main>
   );
