@@ -168,7 +168,7 @@ export default function Chat(): JSX.Element {
               </AppButton>
             </div>
           ) : (
-            <div className="flex justify-center">
+            <div className="flex justify-center mb-10">
               <AppButton
                 text={join.isPending ? "loading..." : "Join Group"}
                 onClick={joinGroup}

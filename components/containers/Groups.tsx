@@ -98,8 +98,14 @@ export default function Groups(): JSX.Element {
                       group.id === groupStore.current ? "font-semibold" : ""
                     }`}
                   >
-                    <button onClick={() => setCurrent(group.id)}>
-                      {group.name}
+                    <button
+                      className="flex items-center w-full justify-between"
+                      onClick={() => setCurrent(group.id)}
+                    >
+                      <p>{group.name}</p>
+                      <p className="h-5 w-5 flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-normal">
+                        9+
+                      </p>
                     </button>
                   </li>
                 ))}
