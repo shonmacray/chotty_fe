@@ -24,16 +24,6 @@ export default function Chat(): JSX.Element {
   });
   const lastRef = useRef<HTMLDivElement>(null);
 
-  // useEffect(() => {
-  //   console.log(inView);
-  // }, [inView]);
-  useEffect(() => {
-    if (groupStore.current) {
-      lastRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupStore.current]);
-
   const { isLoading, data } = useQuery({
     queryKey: ["messages", groupStore.current],
     queryFn: () => FetchMessages(groupStore.current!),
@@ -67,6 +57,13 @@ export default function Chat(): JSX.Element {
   }
 
   useEffect(() => {
+    if (data) {
+      lastRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [group, suggested]);
+
+  useEffect(() => {
     if (!isLoading) {
       if (data && data?.error) {
         logout();
@@ -94,6 +91,7 @@ export default function Chat(): JSX.Element {
         group_id: group.id,
         last_id: data.length,
       });
+      lastRef.current?.scrollIntoView({ behavior: "smooth" });
       setText("");
     }
   };
@@ -110,8 +108,10 @@ export default function Chat(): JSX.Element {
     }
   };
 
+  console.log(data);
+
   return (
-    <div className="pb-10 h-full">
+    <div className="h-full">
       {group !== null || suggested !== null ? (
         <div className="h-full flex flex-col justify-between">
           <div className="flex-1 flex flex-col">
@@ -121,7 +121,7 @@ export default function Chat(): JSX.Element {
                 <CheckmarkBadge02Icon size={20} />
               </div>
             </div>
-            <div className="flex-1 overflow-scroll py-4">
+            <div className="flex-1 overflow-scroll pb-4 pt-2">
               <div className="px-5">
                 {group?.description || suggested.description}
               </div>
@@ -132,8 +132,8 @@ export default function Chat(): JSX.Element {
                       <li>{message.text}</li>
 
                       {data[i]?.user_id !== data[i + 1]?.user_id && (
-                        <li className="my-1 bg-slate-200">
-                          <p className=" text-center text-xs text-slate-700">
+                        <li className="my-1">
+                          <p className="text-xs text-sky-700">
                             {`${data[i]?.user.first_name} ${data[i]?.user.last_name}`}
                           </p>
                         </li>
@@ -147,11 +147,11 @@ export default function Chat(): JSX.Element {
           </div>
 
           {group ? (
-            <div className="flex items-center gap-4 px-5">
+            <div className="flex items-center gap-4 px-5 mb-10">
               <textarea
                 className="flex-1 p-3 rounded-md resize-none h-12"
                 value={text}
-                placeholder="Type message"
+                placeholder={group?.description || suggested.description}
                 onChange={(e) => setText(e.target.value)}
               />
               <AppButton text="Send" onClick={handleSendMessage}>
@@ -170,7 +170,9 @@ export default function Chat(): JSX.Element {
           )}
         </div>
       ) : (
-        <div className="p-10">Select Chat</div>
+        <div className="p-10 h-full flex justify-center items-center">
+          Select Chat
+        </div>
       )}
     </div>
   );

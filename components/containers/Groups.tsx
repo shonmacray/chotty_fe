@@ -14,16 +14,18 @@ import { useSocket } from "@/hooks/UseSocket";
 import { useQuery } from "@tanstack/react-query";
 import { useLogout } from "@/hooks/UseLogout";
 import { joinRooms } from "@/helper";
+import { useUserStore } from "@/store/user";
 
 export default function Groups(): JSX.Element {
   const groupStore = useGroupStore((state: GroupStoreState) => state);
+  const user = useUserStore((state) => state.user);
   const [token, setToken] = useState<string | null>(null);
 
   const socket = useSocket();
   const logout = useLogout();
 
   const { isLoading, data, refetch } = useQuery({
-    queryKey: ["suggested", token],
+    queryKey: ["suggested"],
     queryFn: () => {
       return FetchGroups(token);
     },
@@ -61,14 +63,17 @@ export default function Groups(): JSX.Element {
   }, [data, isLoading]);
 
   useEffect(() => {
-    refetch();
+    if (groupStore.groups.length > 0) {
+      refetch();
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupStore.groups]);
 
   useEffect(() => {
     const t = localStorage.getItem("CT_access_token");
-    setToken(t);
-  }, [token]);
+    setToken(t || user?.access_token!);
+  }, [token, user?.access_token]);
 
   const setCurrent = (id: string) => {
     groupStore.setCurrent(id);

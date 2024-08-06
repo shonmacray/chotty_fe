@@ -2,17 +2,20 @@
 import { login } from "@/app/apis";
 import AppButton from "@/components/Button";
 import Input from "@/components/Input";
+import { UserStoreState, useUserStore } from "@/store/user";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Home() {
   const [form, setForm] = useState({ email_address: "", password: "" });
   const router = useRouter();
+  const user = useUserStore<UserStoreState>((state) => state);
 
   const setUser = async () => {
     if (form.email_address && form.password) {
       const data = await login(form);
 
+      user.setUser({ ...data.user, access_token: data.access_token });
       localStorage.setItem("CT_access_token", data.access_token);
       router.push("home");
     }
