@@ -39,6 +39,25 @@ export const login = async (data: loginData): Promise<any> => {
   return await req.json();
 };
 
+interface SignupData {
+  first_name: string;
+  last_name: string;
+  email_address: string;
+  password: string;
+}
+
+export const signup = async (data: SignupData): Promise<any> => {
+  const req = await fetch(`http://localhost:8000/auth/signup`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  return await req.json();
+};
+
 export const sendJoinRquest = async (
   id: string,
   token: string
