@@ -10,10 +10,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLogout } from "@/hooks/UseLogout";
 import { joinRooms } from "@/helper";
 import { useInView } from "react-intersection-observer";
+import { UserStoreState, useUserStore } from "@/store/user";
 
 export default function Chat(): JSX.Element {
   const [text, setText] = useState<string>();
   const groupStore = useGroupStore<GroupStoreState>((state) => state);
+  const user = useUserStore<UserStoreState>((state) => state);
 
   const socket = useSocket();
   const logout = useLogout();
@@ -108,7 +110,7 @@ export default function Chat(): JSX.Element {
     }
   };
 
-  console.log(data);
+  // console.log(data);
 
   return (
     <div className="h-full">
@@ -134,7 +136,14 @@ export default function Chat(): JSX.Element {
                       {data[i]?.user_id !== data[i + 1]?.user_id && (
                         <li className="my-1">
                           <p className="text-xs text-sky-700">
-                            {`${data[i]?.user.first_name} ${data[i]?.user.last_name}`}
+                            {`${
+                              user.user?.id === data[i]?.user_id
+                                ? "You"
+                                : data[i]?.user.first_name +
+                                  " " +
+                                  data[i]?.user.last_name
+                            } 
+                            `}
                           </p>
                         </li>
                       )}

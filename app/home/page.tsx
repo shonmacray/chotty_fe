@@ -7,7 +7,7 @@ export default function Home(): JSX.Element {
       <div className="w-full hidden lg:block lg:w-3/12 shadow-md rounded-lg overflow-hidden">
         <Groups />
       </div>
-      <div className="flex-1 shadow-md rounded-lg overflow-hidden">
+      <div className="flex-1 h-full shadow-md rounded-lg overflow-hidden">
         <Chat />
       </div>
     </main>
