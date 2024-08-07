@@ -9,6 +9,8 @@ import { Loading02Icon } from "hugeicons-react";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface FormInput {
   first_name: string;
@@ -18,6 +20,13 @@ interface FormInput {
 }
 
 export default function Signup(): JSX.Element {
+  const FormInputSchema = z.object({
+    first_name: z.string().min(3, { message: "First name is to short" }),
+    last_name: z.string().min(3, { message: "Last name is to short" }),
+    email_address: z.string().email().trim(),
+    password: z.string().min(8, { message: "Password is to short" }),
+  });
+
   const { handleSubmit, control } = useForm<FormInput>({
     defaultValues: {
       first_name: "",
@@ -25,7 +34,8 @@ export default function Signup(): JSX.Element {
       email_address: "",
       password: "",
     },
-    mode: "onChange",
+    mode: "onBlur",
+    resolver: zodResolver(FormInputSchema),
   });
 
   const router = useRouter();
@@ -65,27 +75,16 @@ export default function Signup(): JSX.Element {
         <p className="text-3xl my-4 font-bold text-center">Create Account</p>
         <div className="h-2" />
         <div>
-          <Input
-            control={control}
-            name="first_name"
-            placeholder="First name"
-            rules={{ required: true }}
-          />
+          <Input control={control} name="first_name" placeholder="First name" />
         </div>
         <div>
-          <Input
-            control={control}
-            name="last_name"
-            placeholder="Last name"
-            rules={{ required: true }}
-          />
+          <Input control={control} name="last_name" placeholder="Last name" />
         </div>
         <div>
           <Input
             control={control}
             name="email_address"
             placeholder="Email address"
-            rules={{ required: true }}
           />
         </div>
         <div>
@@ -94,7 +93,6 @@ export default function Signup(): JSX.Element {
             name="password"
             placeholder="Password"
             type="password"
-            rules={{ required: true }}
           />
         </div>
         <div className="h-3" />

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
     "@szhsin/react-accordion": "^1.2.4",
     "@tanstack/react-query": "^5.51.21",
     "hugeicons-react": "^0.3.0",
@@ -19,6 +20,7 @@
     "react-intersection-observer": "^9.13.0",
     "react-toastify": "^10.0.5",
     "socket.io-client": "^4.7.5",
+    "zod": "^3.23.8",
     "zustand": "^4.5.4"
   },
   "devDependencies": {

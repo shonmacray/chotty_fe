@@ -9,6 +9,8 @@ export default function Input(
 ): JSX.Element {
   const { field, fieldState } = useController(props);
 
+  console.log(fieldState.error);
+
   return (
     <div>
       <input
@@ -22,7 +24,9 @@ export default function Input(
         type={props.type}
       />
       {fieldState.isTouched && fieldState.invalid && (
-        <p className="pt-1 text-sm text-rose-600">{field.name} is required</p>
+        <p className="text-sm text-rose-600 pt-1">
+          {fieldState.error && fieldState.error.message}
+        </p>
       )}
     </div>
   );
