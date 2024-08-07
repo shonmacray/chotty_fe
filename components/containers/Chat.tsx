@@ -8,7 +8,7 @@ import { CheckmarkBadge02Icon, SentIcon, Tornado01Icon } from "hugeicons-react";
 import { useSocket } from "@/hooks/UseSocket";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLogout } from "@/hooks/UseLogout";
-import { joinRooms } from "@/helper";
+import { joinRooms, userColors } from "@/helper";
 // import { useInView } from "react-intersection-observer";
 import { UserStoreState, useUserStore } from "@/store/user";
 
@@ -115,8 +115,6 @@ export default function Chat(): JSX.Element {
     }
   };
 
-  console.log(group);
-
   return (
     <div className="h-full">
       {group !== null ? (
@@ -144,7 +142,10 @@ export default function Chat(): JSX.Element {
 
                       {data[i]?.user_id !== data[i + 1]?.user_id && (
                         <li className="my-1">
-                          <p className="text-xs text-sky-700">
+                          <p
+                            style={{ color: userColors[data[i].user.color] }}
+                            className="text-xs"
+                          >
                             {`${
                               user.user?.id === data[i]?.user_id
                                 ? "You"
