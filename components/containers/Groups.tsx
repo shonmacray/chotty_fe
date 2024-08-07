@@ -40,13 +40,10 @@ export default function Groups(): JSX.Element {
 
   useEffect(() => {
     if (!mygroupsLoading) {
-      const groups = Array.isArray(mygroups)
-        ? mygroups?.map((groupsU: any) => groupsU.group)
-        : [];
-      if (groups.length > 0) {
-        joinRooms(groups, socket);
+      if (mygroups?.length > 0) {
+        joinRooms(mygroups, socket);
+        groupStore.setGroups(mygroups);
       }
-      groupStore.setGroups(groups);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mygroupsLoading, mygroups]);
@@ -54,7 +51,6 @@ export default function Groups(): JSX.Element {
   useEffect(() => {
     if (!isLoading && data) {
       if (data.error) {
-        console.log(token);
         logout();
       } else {
         groupStore.setSuggestions(data);
@@ -64,7 +60,7 @@ export default function Groups(): JSX.Element {
   }, [data, isLoading]);
 
   useEffect(() => {
-    if (groupStore.groups.length > 0) {
+    if (groupStore.groups?.length > 0) {
       refetch();
     }
 
@@ -91,7 +87,7 @@ export default function Groups(): JSX.Element {
             <div />
           ) : (
             <ul className="px-3 py-1 space-y-2">
-              {groupStore.groups.length > 0 &&
+              {groupStore.groups?.length > 0 &&
                 groupStore.groups.map((group) => (
                   <li
                     key={group.id}

@@ -9,8 +9,6 @@ export default function Input(
 ): JSX.Element {
   const { field, fieldState } = useController(props);
 
-  console.log(fieldState.error);
-
   return (
     <div>
       <input

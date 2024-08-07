@@ -9,11 +9,14 @@ import { useSocket } from "@/hooks/UseSocket";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLogout } from "@/hooks/UseLogout";
 import { joinRooms } from "@/helper";
-import { useInView } from "react-intersection-observer";
+// import { useInView } from "react-intersection-observer";
 import { UserStoreState, useUserStore } from "@/store/user";
 
 export default function Chat(): JSX.Element {
   const [text, setText] = useState<string>();
+  const [group, setGroup] = useState<any>(null);
+  const [suggested, setSuggested] = useState<boolean>(false);
+
   const groupStore = useGroupStore<GroupStoreState>((state) => state);
   const user = useUserStore<UserStoreState>((state) => state);
 
@@ -21,9 +24,9 @@ export default function Chat(): JSX.Element {
   const logout = useLogout();
   const queryClient = useQueryClient();
 
-  const { ref, inView, entries } = useInView({
-    threshold: 0,
-  });
+  // const { ref, inView, entries } = useInView({
+  //   threshold: 0,
+  // });
   const lastRef = useRef<HTMLDivElement>(null);
 
   const { isLoading, data } = useQuery({
@@ -40,30 +43,32 @@ export default function Chat(): JSX.Element {
     },
   });
 
-  let group = null;
-  let suggested = null;
-
-  const mygroup = groupStore.groups.find(
-    (group) => group.id === groupStore.current
-  );
-  if (mygroup === undefined) {
-    const suggestion = groupStore.suggestions.find(
+  useEffect(() => {
+    const mygroup = groupStore.groups?.find(
       (group) => group.id === groupStore.current
     );
 
-    if (suggestion !== undefined) {
-      suggested = suggestion;
+    if (mygroup === undefined) {
+      const suggestion = groupStore.suggestions.find(
+        (group) => group.id === groupStore.current
+      );
+
+      if (suggestion !== undefined) {
+        setGroup(suggestion);
+        setSuggested(true);
+      }
+    } else {
+      setGroup(mygroup);
+      setSuggested(false);
     }
-  } else {
-    group = mygroup;
-  }
+  }, [groupStore]);
 
   useEffect(() => {
     if (data) {
       lastRef.current?.scrollIntoView({ behavior: "smooth" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [group, suggested]);
+  }, [group]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -103,29 +108,33 @@ export default function Chat(): JSX.Element {
       const data = await join.mutateAsync(groupStore.current);
       if (data.created) {
         const groups = [...groupStore.groups];
-        groups.push(suggested);
+        groups.push(group);
         joinRooms(groups, socket);
         groupStore.setGroups(groups);
       }
     }
   };
 
-  // console.log(data);
+  console.log(group);
 
   return (
     <div className="h-full">
-      {group !== null || suggested !== null ? (
+      {group !== null ? (
         <div className="h-full flex flex-col justify-between">
           <div className="flex-1 flex flex-col">
             <div className="h-14 px-5 bg-white flex flex-col justify-center">
               <div className="font-semibold flex gap-2 items-center">
-                <h1 className="text-lg">{group?.name || suggested.name}</h1>
+                <h1 className="text-lg">{group?.name}</h1>
                 <CheckmarkBadge02Icon size={20} />
               </div>
             </div>
             <div className="flex-1 overflow-scroll pb-4 pt-2">
               <div className="px-5">
-                {group?.description || suggested.description}
+                {group?.description}
+                <p className="text-sm font-medium text-yellow-600">
+                  {group?.User_group.length} Subscriber
+                  {group?.User_group.length !== 1 ? "s" : ""}
+                </p>
               </div>
               <div className="px-5 max-h-[350px] pb-4">
                 {data &&
@@ -149,18 +158,18 @@ export default function Chat(): JSX.Element {
                       )}
                     </ul>
                   ))}
-                <div className="h-10" ref={ref} />
+                <div className="h-10" />
                 <div className="" ref={lastRef} />
               </div>
             </div>
           </div>
 
-          {group ? (
+          {!suggested ? (
             <div className="flex items-center gap-4 px-5 mb-10">
               <textarea
                 className="flex-1 p-3 rounded-md resize-none h-12"
                 value={text}
-                placeholder={group?.description || suggested.description}
+                placeholder={group?.description}
                 onChange={(e) => setText(e.target.value)}
               />
               <AppButton text="Send" onClick={handleSendMessage}>
