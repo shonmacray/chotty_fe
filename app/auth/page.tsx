@@ -12,20 +12,17 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-interface FormInput {
-  first_name: string;
-  last_name: string;
-  email_address: string;
-  password: string;
-}
-
 export default function Signup(): JSX.Element {
-  const FormInputSchema = z.object({
-    first_name: z.string().min(3, { message: "First name is to short" }),
-    last_name: z.string().min(3, { message: "Last name is to short" }),
-    email_address: z.string().email().trim(),
-    password: z.string().min(8, { message: "Password is to short" }),
-  });
+  const FormInputSchema = z
+    .object({
+      first_name: z.string().min(3, { message: "First name is to short" }),
+      last_name: z.string().min(3, { message: "Last name is to short" }),
+      email_address: z.string().email().trim(),
+      password: z.string().min(8, { message: "Password is to short" }),
+    })
+    .required();
+
+  type FormInput = z.infer<typeof FormInputSchema>;
 
   const { handleSubmit, control } = useForm<FormInput>({
     defaultValues: {

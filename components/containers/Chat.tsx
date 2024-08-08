@@ -9,11 +9,20 @@ import { useSocket } from "@/hooks/UseSocket";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLogout } from "@/hooks/UseLogout";
 import { joinRooms, userColors } from "@/helper";
-// import { useInView } from "react-intersection-observer";
 import { UserStoreState, useUserStore } from "@/store/user";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const formSchema = z
+  .object({
+    text: z.string().min(1, { message: "text required" }),
+  })
+  .required();
+
+type FormInput = z.infer<typeof formSchema>;
 
 export default function Chat(): JSX.Element {
-  const [text, setText] = useState<string>();
   const [group, setGroup] = useState<any>(null);
   const [suggested, setSuggested] = useState<boolean>(false);
 
@@ -24,10 +33,16 @@ export default function Chat(): JSX.Element {
   const logout = useLogout();
   const queryClient = useQueryClient();
 
-  // const { ref, inView, entries } = useInView({
-  //   threshold: 0,
-  // });
   const lastRef = useRef<HTMLDivElement>(null);
+
+  const {
+    handleSubmit,
+    register,
+    resetField,
+    formState: { isValid },
+  } = useForm<FormInput>({
+    resolver: zodResolver(formSchema),
+  });
 
   const { isLoading, data } = useQuery({
     queryKey: ["messages", groupStore.current],
@@ -90,17 +105,17 @@ export default function Chat(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
 
-  const handleSendMessage = () => {
-    if (text) {
-      socket?.emit("message", {
-        text,
-        room: group.name,
-        group_id: group.id,
-        last_id: data.length,
-      });
-      lastRef.current?.scrollIntoView({ behavior: "smooth" });
-      setText("");
-    }
+  const handleSendMessage: SubmitHandler<FormInput> = (values) => {
+    const { text } = values;
+    socket?.emit("message", {
+      text,
+      room: group.name,
+      group_id: group.id,
+      last_id: data.length,
+    });
+
+    lastRef.current?.scrollIntoView({ behavior: "smooth" });
+    resetField("text");
   };
 
   const joinGroup = async () => {
@@ -166,17 +181,24 @@ export default function Chat(): JSX.Element {
           </div>
 
           {!suggested ? (
-            <div className="flex items-center gap-4 px-5 mb-10">
+            <form
+              onSubmit={handleSubmit(handleSendMessage)}
+              className="flex items-center gap-4 px-5 mb-10"
+            >
               <textarea
                 className="flex-1 p-3 rounded-md resize-none h-12"
-                value={text}
                 placeholder={group?.description}
-                onChange={(e) => setText(e.target.value)}
+                {...register("text")}
               />
-              <AppButton text="Send" onClick={handleSendMessage}>
+              <AppButton
+                type="submit"
+                text=""
+                onClick={() => {}}
+                disabled={!isValid}
+              >
                 <SentIcon />
               </AppButton>
-            </div>
+            </form>
           ) : (
             <div className="flex justify-center mb-10">
               <AppButton
