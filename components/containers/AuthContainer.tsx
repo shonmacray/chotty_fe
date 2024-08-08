@@ -38,7 +38,7 @@ export default function AuthContainer({ children }: Props): JSX.Element {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, path, token, isLoading, data]);
+  }, [token, isLoading, data]);
 
   return <div>{children}</div>;
 }
