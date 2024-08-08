@@ -9,6 +9,15 @@ export const FetchGroups = async (token: string | null): Promise<any> => {
   return await req.json();
 };
 
+export const FetchUser = async (token: string | null): Promise<any> => {
+  const req = await fetch(`${url}/user`, {
+    method: "GET",
+    headers: { authorization: `Bearer ${token}` },
+  });
+
+  return await req.json();
+};
+
 export const FetchMessages = async (groupId: string): Promise<any> => {
   const req = await fetch(`${url}/chat/${groupId}`, {
     method: "GET",

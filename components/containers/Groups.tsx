@@ -108,7 +108,7 @@ export default function Groups(): JSX.Element {
                 ))}
               {groupStore.suggestions.length > 0 && (
                 <li>
-                  <div className="inline-flex gap-1 py-1 bg-emerald-500 text-white items-center px-3 rounded-full">
+                  <div className="inline-flex gap-1 py-1 bg-purple-200 text-black items-center px-3 rounded-full">
                     <FireIcon size={16} />
                     <p className="text-sm font-medium">Suggested</p>
                   </div>

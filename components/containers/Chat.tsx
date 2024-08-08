@@ -20,6 +20,8 @@ const formSchema = z
   })
   .required();
 
+const emoji = z.string().emoji();
+
 type FormInput = z.infer<typeof formSchema>;
 
 export default function Chat(): JSX.Element {
@@ -153,7 +155,13 @@ export default function Chat(): JSX.Element {
                 {data &&
                   data.map((message: any, i: number) => (
                     <ul key={message.id}>
-                      <li>{message.text}</li>
+                      <li
+                        className={`${
+                          emoji.safeParse(message.text).success ? "text-xl" : ""
+                        }`}
+                      >
+                        {message.text}
+                      </li>
 
                       {data[i]?.user_id !== data[i + 1]?.user_id && (
                         <li className="my-1">

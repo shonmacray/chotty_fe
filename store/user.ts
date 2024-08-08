@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 interface User {
   id: number;
-  access_token: string;
+  access_token?: string;
 }
 
 export interface UserStoreState {
