@@ -1,4 +1,4 @@
-export const useLogout = (): any => {
+export const useLogout = () => {
   const logout = () => {
     localStorage.removeItem("CT_access_token");
     window.location.reload();

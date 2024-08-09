@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
 import { io } from "socket.io-client";
 
 let socket: ReturnType<typeof io> | null = null;

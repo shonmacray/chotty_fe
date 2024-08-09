@@ -1,5 +1,7 @@
-export const joinRooms = (data: any, socket: any) => {
-  const rooms = data.map((room: any) => room.name);
+import { Group } from "./store/groups";
+
+export const joinRooms = (data: Group[], socket: any) => {
+  const rooms = data.map((room: Group) => room.name);
   socket?.emit("join", rooms);
 };
 

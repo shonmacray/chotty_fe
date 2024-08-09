@@ -40,7 +40,7 @@ export default function Signup(): JSX.Element {
 
   const create = useMutation({
     mutationKey: ["create"],
-    mutationFn: (data: any) => {
+    mutationFn: (data: FormInput) => {
       return signup(data);
     },
   });

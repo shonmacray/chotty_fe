@@ -1,7 +1,7 @@
 "use client";
 
 import { FetchMessages, sendJoinRquest } from "@/app/apis";
-import { GroupStoreState, useGroupStore } from "@/store/groups";
+import { Group, GroupStoreState, useGroupStore } from "@/store/groups";
 import { useEffect, useRef, useState } from "react";
 import AppButton from "../Button";
 import { CheckmarkBadge02Icon, SentIcon, Tornado01Icon } from "hugeicons-react";
@@ -26,7 +26,7 @@ const emoji = z.string().emoji();
 type FormInput = z.infer<typeof formSchema>;
 
 export default function Chat(): JSX.Element {
-  const [group, setGroup] = useState<any>(null);
+  const [group, setGroup] = useState<Group | null>(null);
   const [suggested, setSuggested] = useState<boolean>(false);
 
   const groupStore = useGroupStore<GroupStoreState>((state) => state);
@@ -95,28 +95,35 @@ export default function Chat(): JSX.Element {
     }
   }, [isLoading, data, logout]);
 
+  type Message = {
+    group_id: number;
+    id: number;
+    last_id: number;
+    room: string;
+    text: string;
+  };
+
   useEffect(() => {
-    socket?.on("member", (data: any) => {
+    socket?.on("member", (data: Message) => {
       queryClient.cancelQueries({ queryKey: ["messages", data.group_id] });
 
-      queryClient.setQueryData(["messages", data.group_id], (old: any) => [
-        ...old,
-        data,
-      ]);
+      queryClient.setQueryData(
+        ["messages", data.group_id],
+        (old: Message[]) => [...old, data]
+      );
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket]);
+  }, [socket, queryClient]);
 
   const handleSendMessage: SubmitHandler<FormInput> = (values) => {
     const { text } = values;
-    socket?.emit("message", {
-      text,
-      room: group.name,
-      group_id: group.id,
-      last_id: data.length,
-    });
-
-    lastRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (group) {
+      socket?.emit("message", {
+        text,
+        room: group.name,
+        group_id: group.id,
+        last_id: data.length,
+      });
+    }
     resetField("text");
   };
 
@@ -124,9 +131,9 @@ export default function Chat(): JSX.Element {
     if (groupStore.current) {
       const data = await join.mutateAsync(groupStore.current);
       if (data.created) {
-        toast.success(`Subscribed to ${group.name}`);
+        toast.success(`Subscribed to ${group?.name}`);
         const groups = [...groupStore.groups];
-        groups.push(group);
+        groups.push(group!);
         joinRooms(groups, socket);
         groupStore.setGroups(groups);
       }
@@ -154,7 +161,7 @@ export default function Chat(): JSX.Element {
               </div>
               <div className="px-5 max-h-[350px] pb-4">
                 {data &&
-                  data.map((message: any, i: number) => (
+                  data.map((message: Message, i: number) => (
                     <ul key={message.id}>
                       <li
                         className={`${
