@@ -18,7 +18,7 @@ export const FetchUser = async (token: string | null): Promise<any> => {
   return await req.json();
 };
 
-export const FetchMessages = async (groupId: string): Promise<any> => {
+export const FetchMessages = async (groupId: number): Promise<any> => {
   const req = await fetch(`${url}/chat/${groupId}`, {
     method: "GET",
   });
@@ -70,7 +70,7 @@ export const signup = async (data: SignupData): Promise<any> => {
 };
 
 export const sendJoinRquest = async (
-  id: string,
+  id: number,
   token: string
 ): Promise<any> => {
   const req = await fetch(`${url}/chat/join/${id}`, {

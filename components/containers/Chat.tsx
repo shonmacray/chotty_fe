@@ -55,7 +55,7 @@ export default function Chat(): JSX.Element {
 
   const join = useMutation({
     mutationKey: ["sendJoinRequest"],
-    mutationFn: (id: string) => {
+    mutationFn: (id: number) => {
       const token = localStorage.getItem("CT_access_token");
       return sendJoinRquest(id, token!);
     },

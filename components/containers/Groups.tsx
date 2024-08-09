@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLogout } from "@/hooks/UseLogout";
 import { joinRooms } from "@/helper";
 import { useUserStore } from "@/store/user";
+import ListItem from "../ListItem";
 
 export default function Groups(): JSX.Element {
   const groupStore = useGroupStore((state: GroupStoreState) => state);
@@ -72,12 +73,12 @@ export default function Groups(): JSX.Element {
     setToken(t || user?.access_token!);
   }, [token, user?.access_token]);
 
-  const setCurrent = (id: string) => {
+  const setCurrent = (id: number) => {
     groupStore.setCurrent(id);
   };
 
   return (
-    <div className="">
+    <div>
       <Accordion transition transitionTimeout={1000}>
         <AccordionItem
           initialEntered
@@ -89,22 +90,13 @@ export default function Groups(): JSX.Element {
             <ul className="px-3 py-1 space-y-2">
               {groupStore.groups?.length > 0 &&
                 groupStore.groups.map((group) => (
-                  <li
+                  <ListItem
                     key={group.id}
-                    className={`${
-                      group.id === groupStore.current ? "font-semibold" : ""
-                    }`}
-                  >
-                    <button
-                      className="flex items-center w-full justify-between"
-                      onClick={() => setCurrent(group.id)}
-                    >
-                      <p>{group.name}</p>
-                      <p className="h-5 w-5 flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-normal">
-                        9+
-                      </p>
-                    </button>
-                  </li>
+                    active={group.id === groupStore.current}
+                    text={group.name}
+                    onClick={() => setCurrent(group.id)}
+                    unseen={30}
+                  />
                 ))}
               {groupStore.suggestions.length > 0 && (
                 <li>
@@ -117,11 +109,12 @@ export default function Groups(): JSX.Element {
 
               {groupStore.suggestions &&
                 groupStore.suggestions.map((group) => (
-                  <li key={group.id}>
-                    <button onClick={() => setCurrent(group.id)}>
-                      {group.name}
-                    </button>
-                  </li>
+                  <ListItem
+                    key={group.id}
+                    active={group.id === groupStore.current}
+                    text={group.name}
+                    onClick={() => setCurrent(group.id)}
+                  />
                 ))}
             </ul>
           )}

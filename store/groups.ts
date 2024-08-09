@@ -1,12 +1,28 @@
 import { create } from "zustand";
 
+export interface Group {
+  id: number;
+  name: string;
+  description: string;
+  updated_at: string;
+  created_at: string;
+  User_group: UserGroups[];
+}
+
+interface UserGroups {
+  id: number;
+  group_id: number;
+  user_id: number;
+  created_at: string;
+}
+
 export interface GroupStoreState {
-  current: string | null;
-  groups: any[];
-  suggestions: any[];
-  setCurrent: (id: string) => void;
-  setGroups: (groups: any) => void;
-  setSuggestions: (suggestion: any) => void;
+  current: number | null;
+  groups: Group[];
+  suggestions: Group[];
+  setCurrent: (id: number) => void;
+  setGroups: (groups: Group[]) => void;
+  setSuggestions: (suggestion: Group[]) => void;
 }
 
 export const useGroupStore = create<GroupStoreState>()((set) => ({
