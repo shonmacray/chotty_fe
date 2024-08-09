@@ -14,6 +14,7 @@ export default function AuthContainer({ children }: Props): JSX.Element {
   const path = usePathname();
   const user = useUserStore<UserStoreState>((state) => state);
   const [token, setToken] = useState<string | null>(null);
+  const [ready, setReady] = useState<boolean>(false);
 
   const { isLoading, data } = useQuery({
     queryKey: ["user", token],
@@ -30,15 +31,24 @@ export default function AuthContainer({ children }: Props): JSX.Element {
     if (token) {
       if (!isLoading && data) {
         user.setUser({ id: data.id });
+        router.replace("home");
       }
-      router.replace("home");
     } else {
       if (path !== "/auth") {
         router.replace("/");
       }
     }
+
+    setTimeout(() => {
+      setReady(true);
+    }, 800);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, isLoading, data]);
 
-  return <div>{children}</div>;
+  if (!ready) {
+    return <div className="bg-zinc-100 h-screen" />;
+  } else {
+    return <div>{children}</div>;
+  }
 }

@@ -22,7 +22,7 @@ export default function Input(
         type={props.type}
       />
       {fieldState.isTouched && fieldState.invalid && (
-        <p className="text-sm text-rose-600 pt-1">
+        <p className="text-sm text-rose-600">
           {fieldState.error && fieldState.error.message}
         </p>
       )}

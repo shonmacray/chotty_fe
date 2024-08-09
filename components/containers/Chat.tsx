@@ -13,6 +13,7 @@ import { UserStoreState, useUserStore } from "@/store/user";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-toastify";
 
 const formSchema = z
   .object({
@@ -81,11 +82,10 @@ export default function Chat(): JSX.Element {
   }, [groupStore]);
 
   useEffect(() => {
-    if (data) {
-      lastRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (group && data) {
+      lastRef.current?.scrollIntoView({ behavior: "instant" });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [group]);
+  }, [group, data]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -124,6 +124,7 @@ export default function Chat(): JSX.Element {
     if (groupStore.current) {
       const data = await join.mutateAsync(groupStore.current);
       if (data.created) {
+        toast.success(`Subscribed to ${group.name}`);
         const groups = [...groupStore.groups];
         groups.push(group);
         joinRooms(groups, socket);
@@ -191,10 +192,10 @@ export default function Chat(): JSX.Element {
           {!suggested ? (
             <form
               onSubmit={handleSubmit(handleSendMessage)}
-              className="flex items-center gap-4 px-5 mb-10"
+              className="flex items-start gap-4 px-5 mb-10"
             >
               <textarea
-                className="flex-1 p-3 rounded-md resize-none h-12"
+                className="flex-1 p-3 rounded-md resize-y max-h-20 min-h-12"
                 placeholder={group?.description}
                 {...register("text")}
               />
